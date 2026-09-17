@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using RRHH.Web.Models;
 
 namespace RRHH.Web.Data;
 
 public class ApplicationDbContext : DbContext
 {
+    public DbSet<Department> Departments { get; set; }
     
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
