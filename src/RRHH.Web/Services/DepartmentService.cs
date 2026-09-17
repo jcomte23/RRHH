@@ -1,8 +1,13 @@
 using RRHH.Web.Models;
 using RRHH.Web.Repositories;
+using RRHH.Web.ViewModels;
 
 namespace RRHH.Web.Services;
 
+/// <summary>
+/// Unico punto donde la entidad Department se convierte en ViewModel y al
+/// reves: fuera de Repositories/Services la entidad no circula.
+/// </summary>
 public class DepartmentService : IDepartmentService
 {
     private readonly IDepartmentRepository _repository;
@@ -12,33 +17,51 @@ public class DepartmentService : IDepartmentService
         _repository = repository;
     }
 
-    public Task<IEnumerable<Department>> GetAllAsync(bool soloActivos = false)
+    public async Task<IEnumerable<DepartmentListItemViewModel>> GetAllAsync(bool soloActivos = false)
     {
-        return _repository.GetAllAsync(soloActivos);
+        var departments = await _repository.GetAllAsync(soloActivos);
+        return departments.Select(ADetalleDeLista).ToList();
     }
 
-    public Task<Department?> GetByIdAsync(Guid id)
+    public async Task<DepartmentDetailsViewModel?> GetDetailsAsync(Guid id)
     {
-        return _repository.GetByIdAsync(id);
+        var department = await _repository.GetByIdAsync(id);
+        return department is null ? null : ADetalle(department);
     }
 
-    public Task CreateAsync(Department department)
+    public async Task<DepartmentFormViewModel?> GetForEditAsync(Guid id)
     {
-        Normalizar(department);
+        var department = await _repository.GetByIdAsync(id);
+        return department is null ? null : AFormulario(department);
+    }
 
-        // El id y el created_at los pone la base (gen_random_uuid() / now()).
-        department.Id = Guid.Empty;
-        department.UpdatedAt = null;
+    public Task CreateAsync(DepartmentFormViewModel modelo)
+    {
+        var department = new Department
+        {
+            // El id y el created_at los pone la base
+            // (gen_random_uuid() / now()); un departamento nuevo nace activo.
+            IsActive = true,
+            UpdatedAt = null
+        };
 
+        AplicarCambios(modelo, department);
         return _repository.AddAsync(department);
     }
 
-    public Task UpdateAsync(Department department)
+    public async Task<bool> UpdateAsync(DepartmentFormViewModel modelo)
     {
-        Normalizar(department);
+        var department = await _repository.GetByIdAsync(modelo.Id);
+        if (department is null)
+        {
+            return false;
+        }
+
+        AplicarCambios(modelo, department);
         department.UpdatedAt = DateTimeOffset.UtcNow;
 
-        return _repository.UpdateAsync(department);
+        await _repository.UpdateAsync(department);
+        return true;
     }
 
     public Task<bool> DeactivateAsync(Guid id)
@@ -75,14 +98,63 @@ public class DepartmentService : IDepartmentService
         return true;
     }
 
-    private static void Normalizar(Department department)
+    /// <summary>Vuelca el formulario sobre la entidad, ya normalizado.</summary>
+    private static void AplicarCambios(DepartmentFormViewModel modelo, Department department)
     {
-        department.Code = NormalizarCodigo(department.Code);
-        department.Name = department.Name.Trim();
-        department.Description = LimpiarOpcional(department.Description);
-        department.Location = LimpiarOpcional(department.Location);
-        department.Phone = LimpiarOpcional(department.Phone);
-        department.Email = LimpiarOpcional(department.Email);
+        department.Code = NormalizarCodigo(modelo.Code);
+        department.Name = modelo.Name.Trim();
+        department.Description = LimpiarOpcional(modelo.Description);
+        department.Location = LimpiarOpcional(modelo.Location);
+        department.Budget = modelo.Budget;
+        department.Phone = LimpiarOpcional(modelo.Phone);
+        department.Email = LimpiarOpcional(modelo.Email);
+    }
+
+    private static DepartmentListItemViewModel ADetalleDeLista(Department department)
+    {
+        return new DepartmentListItemViewModel
+        {
+            Id = department.Id,
+            Code = department.Code,
+            Name = department.Name,
+            Description = department.Description,
+            Location = department.Location,
+            Budget = department.Budget,
+            IsActive = department.IsActive
+        };
+    }
+
+    private static DepartmentDetailsViewModel ADetalle(Department department)
+    {
+        return new DepartmentDetailsViewModel
+        {
+            Id = department.Id,
+            Code = department.Code,
+            Name = department.Name,
+            Description = department.Description,
+            Location = department.Location,
+            Budget = department.Budget,
+            Phone = department.Phone,
+            Email = department.Email,
+            IsActive = department.IsActive,
+            CreatedAt = department.CreatedAt,
+            UpdatedAt = department.UpdatedAt
+        };
+    }
+
+    private static DepartmentFormViewModel AFormulario(Department department)
+    {
+        return new DepartmentFormViewModel
+        {
+            Id = department.Id,
+            Code = department.Code,
+            Name = department.Name,
+            Description = department.Description,
+            Location = department.Location,
+            Budget = department.Budget,
+            Phone = department.Phone,
+            Email = department.Email
+        };
     }
 
     private static string NormalizarCodigo(string code)

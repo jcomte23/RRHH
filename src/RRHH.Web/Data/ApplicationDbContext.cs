@@ -32,6 +32,14 @@ public class ApplicationDbContext : DbContext
 
             entity.Property(d => d.Budget).HasPrecision(14, 2);
 
+            // Longitudes del esquema; las validaciones equivalentes estan en
+            // DepartmentFormViewModel.
+            entity.Property(d => d.Code).HasMaxLength(10).IsRequired();
+            entity.Property(d => d.Name).HasMaxLength(60).IsRequired();
+            entity.Property(d => d.Location).HasMaxLength(80);
+            entity.Property(d => d.Phone).HasMaxLength(20);
+            entity.Property(d => d.Email).HasMaxLength(120);
+
             entity.HasIndex(d => d.Code).IsUnique();
             entity.HasIndex(d => d.Name).IsUnique();
         });

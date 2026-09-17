@@ -1,16 +1,18 @@
-using RRHH.Web.Models;
+using RRHH.Web.ViewModels;
 
 namespace RRHH.Web.Services;
 
 public interface IDepartmentService
 {
-    Task<IEnumerable<Department>> GetAllAsync(bool soloActivos = false);
+    Task<IEnumerable<DepartmentListItemViewModel>> GetAllAsync(bool soloActivos = false);
 
-    Task<Department?> GetByIdAsync(Guid id);
+    Task<DepartmentDetailsViewModel?> GetDetailsAsync(Guid id);
 
-    Task CreateAsync(Department department);
+    Task<DepartmentFormViewModel?> GetForEditAsync(Guid id);
 
-    Task UpdateAsync(Department department);
+    Task CreateAsync(DepartmentFormViewModel modelo);
+
+    Task<bool> UpdateAsync(DepartmentFormViewModel modelo);
 
     /// <summary>Borrado logico: desactiva el departamento en lugar de eliminarlo.</summary>
     Task<bool> DeactivateAsync(Guid id);

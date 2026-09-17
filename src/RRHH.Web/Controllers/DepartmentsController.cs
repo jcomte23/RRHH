@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using RRHH.Web.Models;
 using RRHH.Web.Services;
+using RRHH.Web.ViewModels;
 
 namespace RRHH.Web.Controllers;
 
@@ -22,95 +22,82 @@ public class DepartmentsController : Controller
 
     public async Task<IActionResult> Details(Guid id)
     {
-        var department = await _departmentService.GetByIdAsync(id);
-        if (department is null)
+        var departamento = await _departmentService.GetDetailsAsync(id);
+        if (departamento is null)
         {
             return NotFound();
         }
 
-        return View(department);
+        return View(departamento);
     }
 
     public IActionResult Create()
     {
-        return View(new Department());
+        return View(new DepartmentFormViewModel());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Department department)
+    public async Task<IActionResult> Create(DepartmentFormViewModel modelo)
     {
-        await ValidarDuplicadosAsync(department);
+        await ValidarDuplicadosAsync(modelo);
 
         if (!ModelState.IsValid)
         {
-            return View(department);
+            return View(modelo);
         }
 
-        await _departmentService.CreateAsync(department);
-        TempData["Mensaje"] = $"El departamento {department.Name} se creó correctamente.";
+        await _departmentService.CreateAsync(modelo);
+        TempData["Mensaje"] = $"El departamento {modelo.Name} se creó correctamente.";
         return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Edit(Guid id)
     {
-        var department = await _departmentService.GetByIdAsync(id);
-        if (department is null)
+        var modelo = await _departmentService.GetForEditAsync(id);
+        if (modelo is null)
         {
             return NotFound();
         }
 
-        return View(department);
+        return View(modelo);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, Department department)
+    public async Task<IActionResult> Edit(Guid id, DepartmentFormViewModel modelo)
     {
-        if (id != department.Id)
+        if (id != modelo.Id)
         {
             return BadRequest();
         }
 
-        await ValidarDuplicadosAsync(department);
+        await ValidarDuplicadosAsync(modelo);
 
         if (!ModelState.IsValid)
         {
-            return View(department);
+            return View(modelo);
         }
 
-        var actual = await _departmentService.GetByIdAsync(id);
-        if (actual is null)
+        if (!await _departmentService.UpdateAsync(modelo))
         {
             return NotFound();
         }
 
-        // Solo se copian los campos editables: id, created_at y updated_at
-        // no viajan en el formulario.
-        actual.Code = department.Code;
-        actual.Name = department.Name;
-        actual.Description = department.Description;
-        actual.Location = department.Location;
-        actual.Budget = department.Budget;
-        actual.Phone = department.Phone;
-        actual.Email = department.Email;
-        actual.IsActive = department.IsActive;
-
-        await _departmentService.UpdateAsync(actual);
-        TempData["Mensaje"] = $"El departamento {actual.Name} se actualizó correctamente.";
+        TempData["Mensaje"] = $"El departamento {modelo.Name} se actualizó correctamente.";
         return RedirectToAction(nameof(Index));
     }
 
     /// <summary>Pantalla de confirmacion del borrado logico.</summary>
     public async Task<IActionResult> Deactivate(Guid id)
     {
-        var department = await _departmentService.GetByIdAsync(id);
-        if (department is null)
+        var departamento = await _departmentService.GetDetailsAsync(id);
+        if (departamento is null)
         {
             return NotFound();
         }
 
-        return View(department);
+        return View(departamento);
     }
 
     [HttpPost]
@@ -144,20 +131,20 @@ public class DepartmentsController : Controller
     /// code y name son unique en la base: se valida antes para mostrar un
     /// mensaje en el formulario en lugar de dejar estallar la excepcion.
     /// </summary>
-    private async Task ValidarDuplicadosAsync(Department department)
+    private async Task ValidarDuplicadosAsync(DepartmentFormViewModel modelo)
     {
-        var excluirId = department.Id == Guid.Empty ? (Guid?)null : department.Id;
+        var excluirId = modelo.Id == Guid.Empty ? (Guid?)null : modelo.Id;
 
-        if (!string.IsNullOrWhiteSpace(department.Code)
-            && await _departmentService.CodeExistsAsync(department.Code, excluirId))
+        if (!string.IsNullOrWhiteSpace(modelo.Code)
+            && await _departmentService.CodeExistsAsync(modelo.Code, excluirId))
         {
-            ModelState.AddModelError(nameof(Department.Code), "Ya existe un departamento con ese código.");
+            ModelState.AddModelError(nameof(modelo.Code), "Ya existe un departamento con ese código.");
         }
 
-        if (!string.IsNullOrWhiteSpace(department.Name)
-            && await _departmentService.NameExistsAsync(department.Name, excluirId))
+        if (!string.IsNullOrWhiteSpace(modelo.Name)
+            && await _departmentService.NameExistsAsync(modelo.Name, excluirId))
         {
-            ModelState.AddModelError(nameof(Department.Name), "Ya existe un departamento con ese nombre.");
+            ModelState.AddModelError(nameof(modelo.Name), "Ya existe un departamento con ese nombre.");
         }
     }
 }

@@ -1,4 +1,4 @@
-@model Department
+@model DepartmentDetailsViewModel
 @{
     ViewData["Title"] = "Detalle del departamento";
 }
@@ -28,7 +28,7 @@
                     <dd class="col-sm-8">@(Model.Location ?? "—")</dd>
 
                     <dt class="col-sm-4">@Html.DisplayNameFor(m => m.Budget)</dt>
-                    <dd class="col-sm-8">@(Model.Budget.HasValue ? Model.Budget.Value.ToString("C2") : "—")</dd>
+                    <dd class="col-sm-8">@Model.BudgetTexto</dd>
 
                     <dt class="col-sm-4">@Html.DisplayNameFor(m => m.Phone)</dt>
                     <dd class="col-sm-8">@(Model.Phone ?? "—")</dd>
@@ -46,11 +46,11 @@
                     </dd>
 
                     <dt class="col-sm-4">@Html.DisplayNameFor(m => m.CreatedAt)</dt>
-                    <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("g")</dd>
+                    <dd class="col-sm-8">@Model.CreatedAtTexto</dd>
 
                     <dt class="col-sm-4">@Html.DisplayNameFor(m => m.UpdatedAt)</dt>
                     <dd class="col-sm-8">
-                        @(Model.UpdatedAt.HasValue ? Model.UpdatedAt.Value.ToLocalTime().ToString("g") : "Sin ediciones")
+                        @Model.UpdatedAtTexto
                     </dd>
 
                     <dt class="col-sm-4">Identificador</dt>

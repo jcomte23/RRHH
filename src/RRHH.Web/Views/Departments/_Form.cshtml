@@ -1,4 +1,4 @@
-@model Department
+@model DepartmentFormViewModel
 
 <div class="row g-3">
     <div class="col-12 col-sm-4">
@@ -41,13 +41,5 @@
         <label asp-for="Email" class="form-label"></label>
         <input asp-for="Email" class="form-control" type="email" placeholder="area@empresa.com" maxlength="120">
         <span asp-validation-for="Email" class="text-danger small"></span>
-    </div>
-
-    <div class="col-12">
-        <div class="form-check form-switch">
-            <input asp-for="IsActive" class="form-check-input" role="switch">
-            <label asp-for="IsActive" class="form-check-label"></label>
-        </div>
-        <div class="form-text">Los departamentos disueltos se desactivan, no se eliminan.</div>
     </div>
 </div>
