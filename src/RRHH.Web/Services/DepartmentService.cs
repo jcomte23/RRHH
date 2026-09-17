@@ -1,6 +1,6 @@
 using RRHH.Web.Models;
 using RRHH.Web.Repositories;
-using RRHH.Web.ViewModels;
+using RRHH.Web.ViewModels.Departments;
 
 namespace RRHH.Web.Services;
 

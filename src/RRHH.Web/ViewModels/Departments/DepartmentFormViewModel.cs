@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace RRHH.Web.ViewModels;
+namespace RRHH.Web.ViewModels.Departments;
 
 /// <summary>
 /// Campos editables de un departamento. No expone id generado, fechas ni

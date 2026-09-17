@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace RRHH.Web.ViewModels;
+namespace RRHH.Web.ViewModels.Departments;
 
 /// <summary>Vista de solo lectura del departamento completo.</summary>
 public class DepartmentDetailsViewModel

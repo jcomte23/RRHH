@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RRHH.Web.Services;
-using RRHH.Web.ViewModels;
+using RRHH.Web.ViewModels.Departments;
 
 namespace RRHH.Web.Controllers;
 

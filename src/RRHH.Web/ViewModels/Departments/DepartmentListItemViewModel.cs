@@ -1,4 +1,4 @@
-namespace RRHH.Web.ViewModels;
+namespace RRHH.Web.ViewModels.Departments;
 
 /// <summary>Lo que necesita una fila del listado, nada mas.</summary>
 public class DepartmentListItemViewModel

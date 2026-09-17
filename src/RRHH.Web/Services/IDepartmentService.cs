@@ -1,4 +1,4 @@
-using RRHH.Web.ViewModels;
+using RRHH.Web.ViewModels.Departments;
 
 namespace RRHH.Web.Services;
 
