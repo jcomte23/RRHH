@@ -29,6 +29,8 @@ No está pensada para producción; el objetivo es aprender haciendo.
 ## Estructura del proyecto
 
 ```
+db/
+└── schema.sql          Script SQL con el esquema de la base de datos
 src/RRHH.Web/
 ├── Controllers/        Acciones MVC (reciben la petición, devuelven vistas o redirecciones)
 ├── Services/           Lógica de negocio; trabaja con ViewModels
@@ -36,7 +38,7 @@ src/RRHH.Web/
 ├── Data/
 │   ├── ApplicationDbContext.cs
 │   └── Configurations/ Mapeo de cada entidad (Fluent API)
-├── Models/             Entidades de persistencia (Department, Employee)
+├── Models/             Entidades de persistencia (Department)
 ├── ViewModels/
 │   └── Departments/    ViewModels por módulo (listado, detalle, formulario)
 ├── Views/              Vistas Razor
@@ -54,12 +56,11 @@ Navegador → DepartmentsController → IDepartmentService → IDepartmentReposi
 
 - **Departamentos** (completo): listado con filtro de activos, detalle, crear, editar,
   desactivar y reactivar.
-- **Empleados**: pendiente.
 
 ## Requisitos
 
 - [SDK de .NET 10](https://dotnet.microsoft.com/download)
-- Una instancia de PostgreSQL con la tabla `departments` creada (ver abajo)
+- Una instancia de PostgreSQL (el esquema se crea con `db/schema.sql`, ver abajo)
 
 ## Puesta en marcha
 
@@ -71,27 +72,16 @@ Navegador → DepartmentsController → IDepartmentService → IDepartmentReposi
    ```json
    {
      "ConnectionStrings": {
-       "DefaultConnection": "Host=localhost;Port=5432;Database=rrhh;Username=postgres;Password=tu_password"
+       "DefaultConnection": "Host=localhost;Port=5432;Database=nomina;Username=postgres;Password=tu_password"
      }
    }
    ```
 
-3. Crear la tabla en PostgreSQL (el proyecto no usa migraciones; el esquema ya existe):
+3. Crear el esquema en PostgreSQL ejecutando el script que está en `db/schema.sql`
+   (el proyecto no usa migraciones de EF Core; el esquema se administra con SQL):
 
-   ```sql
-   CREATE TABLE departments (
-       id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-       code        varchar(10)  NOT NULL UNIQUE,
-       name        varchar(60)  NOT NULL UNIQUE,
-       description text,
-       location    varchar(80),
-       budget      numeric(14,2),
-       phone       varchar(20),
-       email       varchar(120),
-       is_active   boolean      NOT NULL DEFAULT true,
-       created_at  timestamptz  NOT NULL DEFAULT now(),
-       updated_at  timestamptz
-   );
+   ```bash
+   psql -h localhost -U postgres -f db/schema.sql
    ```
 
 4. Ejecutar:
