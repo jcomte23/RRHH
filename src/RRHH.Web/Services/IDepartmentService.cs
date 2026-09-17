@@ -4,7 +4,7 @@ namespace RRHH.Web.Services;
 
 public interface IDepartmentService
 {
-    Task<IEnumerable<Department>> GetAllAsync();
+    Task<IEnumerable<Department>> GetAllAsync(bool soloActivos = false);
 
     Task<Department?> GetByIdAsync(Guid id);
 
@@ -12,5 +12,12 @@ public interface IDepartmentService
 
     Task UpdateAsync(Department department);
 
-    Task<bool> DeleteAsync(Guid id);
+    /// <summary>Borrado logico: desactiva el departamento en lugar de eliminarlo.</summary>
+    Task<bool> DeactivateAsync(Guid id);
+
+    Task<bool> ActivateAsync(Guid id);
+
+    Task<bool> CodeExistsAsync(string code, Guid? excluirId = null);
+
+    Task<bool> NameExistsAsync(string name, Guid? excluirId = null);
 }

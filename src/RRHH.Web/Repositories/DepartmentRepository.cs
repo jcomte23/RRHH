@@ -13,11 +13,18 @@ public class DepartmentRepository : IDepartmentRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Department>> GetAllAsync()
+    public async Task<IEnumerable<Department>> GetAllAsync(bool soloActivos = false)
     {
-        return await _context.Departments
-            .AsNoTracking()
-            .OrderBy(d => d.Name)
+        var consulta = _context.Departments.AsNoTracking().AsQueryable();
+
+        if (soloActivos)
+        {
+            consulta = consulta.Where(d => d.IsActive);
+        }
+
+        return await consulta
+            .OrderByDescending(d => d.IsActive)
+            .ThenBy(d => d.Name)
             .ToListAsync();
     }
 
@@ -38,9 +45,17 @@ public class DepartmentRepository : IDepartmentRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Department department)
+    public async Task<bool> CodeExistsAsync(string code, Guid? excluirId = null)
     {
-        _context.Departments.Remove(department);
-        await _context.SaveChangesAsync();
+        return await _context.Departments
+            .AsNoTracking()
+            .AnyAsync(d => d.Code == code && (excluirId == null || d.Id != excluirId));
+    }
+
+    public async Task<bool> NameExistsAsync(string name, Guid? excluirId = null)
+    {
+        return await _context.Departments
+            .AsNoTracking()
+            .AnyAsync(d => d.Name == name && (excluirId == null || d.Id != excluirId));
     }
 }
