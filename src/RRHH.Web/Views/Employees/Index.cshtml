@@ -1,0 +1,166 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model IEnumerable<EmployeeListItemViewModel>
+@{
+    ViewData["Title"] = "Empleados";
+    var soloActivos = ViewData["SoloActivos"] is true;
+    var departmentId = ViewData["DepartmentId"] as Guid?;
+    var departamentos = ViewData["Departamentos"] as IEnumerable<SelectListItem> ?? [];
+    var total = Model.Count();
+    var activos = Model.Count(e => e.IsActive);
+    var hayFiltros = soloActivos || departmentId.HasValue;
+}
+
+@if (TempData["Mensaje"] is string mensaje)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @mensaje
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+<section class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Empleados</h1>
+        <p class="text-muted mb-0">Gestiona el personal de la organización.</p>
+    </div>
+    <div>
+        <a asp-action="Create" asp-route-departmentId="@departmentId" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="me-1">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+            Nuevo empleado
+        </a>
+    </div>
+</section>
+
+<section class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+            <div class="col-12 col-md-5 col-lg-4">
+                <select name="departmentId" class="form-select" aria-label="Filtrar por departamento" onchange="this.form.submit()">
+                    <option value="">Todos los departamentos</option>
+                    @foreach (var opcion in departamentos)
+                    {
+                        <option value="@opcion.Value" selected="@(opcion.Value == departmentId?.ToString())">@opcion.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-auto">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="soloActivos" name="soloActivos" value="true"
+                           checked="@soloActivos" onchange="this.form.submit()">
+                    <label class="form-check-label" for="soloActivos">Solo activos</label>
+                </div>
+            </div>
+            @if (hayFiltros)
+            {
+                <div class="col-auto">
+                    <a asp-action="Index" class="btn btn-sm btn-link">Quitar filtros</a>
+                </div>
+            }
+            <div class="col d-flex justify-content-md-end">
+                <span class="badge rounded-pill text-bg-light border">
+                    @total @(total == 1 ? "empleado" : "empleados")
+                    @if (!soloActivos && total != activos)
+                    {
+                        @($" · {activos} activos")
+                    }
+                </span>
+            </div>
+            <noscript>
+                <div class="col-auto"><button type="submit" class="btn btn-sm btn-outline-secondary">Filtrar</button></div>
+            </noscript>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col" class="ps-4">Empleado</th>
+                    <th scope="col">Cargo</th>
+                    <th scope="col">Departamento</th>
+                    <th scope="col">Ingreso</th>
+                    <th scope="col" class="text-end">Salario</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col" class="text-end pe-4">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var employee in Model)
+                {
+                    <tr class="@(employee.IsActive ? null : "text-body-secondary")">
+                        <td class="ps-4">
+                            <div class="fw-semibold">@employee.FullName</div>
+                            <small class="text-muted">@employee.DocumentNumber@(employee.Email is null ? "" : $" · {employee.Email}")</small>
+                        </td>
+                        <td>@employee.Position</td>
+                        <td class="text-muted">@employee.DepartmentName</td>
+                        <td>@employee.HireDate.ToString("d")</td>
+                        <td class="text-end">@employee.Salary.ToString("C2")</td>
+                        <td>
+                            <span class="badge rounded-pill @(employee.IsActive ? "text-bg-success" : "text-bg-secondary")">
+                                @(employee.IsActive ? "Activo" : "Retirado")
+                            </span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Acciones">
+                                <a asp-action="Details" asp-route-id="@employee.Id" class="btn btn-outline-secondary" title="Ver detalles">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                    </svg>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@employee.Id" class="btn btn-outline-primary" title="Editar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                    </svg>
+                                </a>
+                                @if (employee.IsActive)
+                                {
+                                    <a asp-action="Deactivate" asp-route-id="@employee.Id" class="btn btn-outline-danger" title="Retirar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                        </svg>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <form asp-action="Activate" asp-route-id="@employee.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-success btn-sm" title="Reintegrar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+
+                @if (total == 0)
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5">
+                            @if (hayFiltros)
+                            {
+                                @("No hay empleados con esos filtros. ")
+                                <a asp-action="Index">Ver todos</a>
+                                @(".")
+                            }
+                            else
+                            {
+                                @("Aún no hay empleados registrados. ")
+                                <a asp-action="Create">Registra el primero</a>
+                                @(".")
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

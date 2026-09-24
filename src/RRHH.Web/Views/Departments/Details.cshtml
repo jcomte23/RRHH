@@ -59,6 +59,7 @@
             </div>
             <div class="card-footer bg-white d-flex gap-2">
                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Editar</a>
+                <a asp-controller="Employees" asp-action="Index" asp-route-departmentId="@Model.Id" class="btn btn-outline-secondary">Ver empleados</a>
                 @if (Model.IsActive)
                 {
                     <a asp-action="Deactivate" asp-route-id="@Model.Id" class="btn btn-outline-danger">Desactivar</a>

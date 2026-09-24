@@ -5,7 +5,8 @@ Guía para trabajar en este repositorio. Proyecto de estudio (no productivo) de 
 ## Stack
 
 - .NET 10, ASP.NET Core MVC (controladores + vistas Razor), `Nullable` e `ImplicitUsings` activos.
-- EF Core 10 + Npgsql sobre PostgreSQL. Enfoque **database-first**: no hay migraciones.
+- EF Core 10 + Npgsql sobre PostgreSQL. Enfoque **code-first** con migraciones en `Data/Migrations`
+  (herramienta `dotnet-ef` local en `dotnet-tools.json`).
 - Bootstrap 5 y jQuery Validation servidos desde `wwwroot/lib` (versionados en el repo).
 - Solución: `RRHH.slnx` con un único proyecto, `src/RRHH.Web`.
 
@@ -14,7 +15,9 @@ Guía para trabajar en este repositorio. Proyecto de estudio (no productivo) de 
 ```bash
 dotnet build RRHH.slnx
 dotnet run --project src/RRHH.Web
-psql -h localhost -U postgres -f db/schema.sql
+dotnet tool restore
+dotnet ef database update --project src/RRHH.Web
+dotnet ef migrations add <Nombre> --project src/RRHH.Web
 ```
 
 No hay proyecto de pruebas todavía.
@@ -37,8 +40,8 @@ Flujo: `Controller → I*Service → I*Repository → ApplicationDbContext → P
 
 ## Añadir un módulo nuevo (p. ej. Employees)
 
-1. La tabla ya debe existir en `db/schema.sql` (la tabla `employees` ya está creada, sin mapear aún).
-2. Entidad en `Models/` + `XConfiguration` en `Data/Configurations/` + `DbSet` en `ApplicationDbContext`.
+1. Entidad en `Models/` + `XConfiguration` en `Data/Configurations/` + `DbSet` en `ApplicationDbContext`.
+2. Generar la migración con `dotnet ef migrations add`.
 3. `IXRepository`/`XRepository`, `IXService`/`XService`, ViewModels en `ViewModels/X/`.
 4. Registrar ambos en `Program.cs`, crear `XController` y vistas en `Views/X/` (formulario compartido en `_Form.cshtml`).
 
@@ -59,9 +62,9 @@ Flujo: `Controller → I*Service → I*Repository → ApplicationDbContext → P
 
 - **No subir credenciales.** La cadena de conexión `DefaultConnection` debe ir en `dotnet user-secrets`
   o variables de entorno, no en `appsettings*.json`.
-- **Cultura:** la máquina de desarrollo usa `es-CO` (coma decimal). Los inputs `type="number"` envían punto
-  decimal y el model binding usa la cultura actual, así que los `decimal` pueden bindearse mal. Tenerlo en
-  cuenta al tocar formularios con números o formatos de moneda/fecha.
-- Cambios de esquema se hacen en `db/schema.sql` y en la configuración Fluent correspondiente; no usar
-  `dotnet ef migrations`.
+- **Cultura:** `Program.cs` fija con `UseRequestLocalization` una `es-CO` con **punto decimal** (fechas en
+  español, números como los envían `<input type="number">` y jQuery Validation). No quitarla: con la coma
+  de `es-CO` el model binding leía `1500.50` como `150050`.
+- Cambios de esquema: configuración Fluent + nueva migración. `db/schema.sql` es el script original y ya no
+  coincide con el modelo (p. ej. `employees.document` vs `document_number`).
 - En `Index.cshtml` de Departamentos, el buscador, Importar/Exportar y la paginación son maqueta sin lógica.

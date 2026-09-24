@@ -1,0 +1,63 @@
+@model RRHH.Web.ViewModels.Employees.EmployeeFormViewModel
+
+<div class="row g-3">
+    <div class="col-12 col-sm-4">
+        <label asp-for="DocumentNumber" class="form-label"></label>
+        <input asp-for="DocumentNumber" class="form-control" placeholder="1020458796" maxlength="20">
+        <span asp-validation-for="DocumentNumber" class="text-danger small"></span>
+    </div>
+    <div class="col-12 col-sm-4">
+        <label asp-for="FirstName" class="form-label"></label>
+        <input asp-for="FirstName" class="form-control" placeholder="Laura" maxlength="60">
+        <span asp-validation-for="FirstName" class="text-danger small"></span>
+    </div>
+    <div class="col-12 col-sm-4">
+        <label asp-for="LastName" class="form-label"></label>
+        <input asp-for="LastName" class="form-control" placeholder="Mendoza Pérez" maxlength="60">
+        <span asp-validation-for="LastName" class="text-danger small"></span>
+    </div>
+
+    <div class="col-12 col-sm-6">
+        <label asp-for="DepartmentId" class="form-label"></label>
+        <select asp-for="DepartmentId" asp-items="Model.Departments" class="form-select">
+            <option value="">Selecciona...</option>
+        </select>
+        <span asp-validation-for="DepartmentId" class="text-danger small"></span>
+    </div>
+    <div class="col-12 col-sm-6">
+        <label asp-for="Position" class="form-label"></label>
+        <input asp-for="Position" class="form-control" placeholder="Desarrolladora Backend" maxlength="80">
+        <span asp-validation-for="Position" class="text-danger small"></span>
+    </div>
+
+    <div class="col-12 col-sm-6">
+        <label asp-for="HireDate" class="form-label"></label>
+        <input asp-for="HireDate" class="form-control" type="date">
+        <span asp-validation-for="HireDate" class="text-danger small"></span>
+    </div>
+    <div class="col-12 col-sm-6">
+        <label asp-for="Salary" class="form-label"></label>
+        <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input asp-for="Salary" class="form-control" type="number" step="0.01" min="0.01" placeholder="0.00">
+        </div>
+        <span asp-validation-for="Salary" class="text-danger small"></span>
+    </div>
+
+    <div class="col-12 col-sm-6">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" type="email" placeholder="nombre@empresa.com" maxlength="120">
+        <span asp-validation-for="Email" class="text-danger small"></span>
+    </div>
+    <div class="col-12 col-sm-6">
+        <label asp-for="Phone" class="form-label"></label>
+        <input asp-for="Phone" class="form-control" placeholder="+57 300 000 0000" maxlength="20">
+        <span asp-validation-for="Phone" class="text-danger small"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Address" class="form-label"></label>
+        <input asp-for="Address" class="form-control" placeholder="Calle 100 # 15-20, Bogotá" maxlength="150">
+        <span asp-validation-for="Address" class="text-danger small"></span>
+    </div>
+</div>

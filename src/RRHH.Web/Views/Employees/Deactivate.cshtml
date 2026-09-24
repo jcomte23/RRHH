@@ -1,0 +1,42 @@
+@model EmployeeDeactivateViewModel
+@{
+    ViewData["Title"] = "Retirar empleado";
+}
+
+<section class="mb-4">
+    <h1 class="h3 mb-1">Retirar empleado</h1>
+    <p class="text-muted mb-0">El registro no se elimina: queda inactivo con su fecha de retiro y se puede reintegrar después.</p>
+</section>
+
+<div class="row">
+    <div class="col-12 col-lg-8 col-xl-6">
+        <div class="card shadow-sm border-0 border-start border-warning border-4">
+            <form asp-action="Deactivate" asp-route-id="@Model.Id" method="post">
+                <div class="card-body">
+                    <p class="mb-3">
+                        ¿Confirmas el retiro de
+                        <strong>@Model.FullName</strong> (@Model.DocumentNumber)?
+                    </p>
+                    <dl class="row mb-3">
+                        <dt class="col-sm-4">@Html.DisplayNameFor(m => m.Position)</dt>
+                        <dd class="col-sm-8">@Model.Position</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(m => m.DepartmentName)</dt>
+                        <dd class="col-sm-8">@Model.DepartmentName</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(m => m.HireDate)</dt>
+                        <dd class="col-sm-8 mb-0">@Model.HireDate.ToString("d")</dd>
+                    </dl>
+
+                    <label asp-for="TerminationDate" class="form-label"></label>
+                    <input asp-for="TerminationDate" class="form-control" type="date" style="max-width: 14rem">
+                    <span asp-validation-for="TerminationDate" class="text-danger small"></span>
+                </div>
+                <div class="card-footer bg-white d-flex gap-2">
+                    <button type="submit" class="btn btn-warning">Sí, retirar</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

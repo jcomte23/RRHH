@@ -1,0 +1,32 @@
+@model RRHH.Web.ViewModels.Employees.EmployeeFormViewModel
+@{
+    ViewData["Title"] = "Nuevo empleado";
+}
+
+<section class="mb-4">
+    <h1 class="h3 mb-1">Nuevo empleado</h1>
+    <p class="text-muted mb-0">Registra un empleado y asígnalo a un departamento.</p>
+</section>
+
+<div class="row">
+    <div class="col-12 col-lg-9 col-xl-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <partial name="_Form" model="Model" />
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
