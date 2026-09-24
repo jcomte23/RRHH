@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace RRHH.Web.Models;
 
 /// <summary>
@@ -28,4 +30,6 @@ public class Department
     public DateTimeOffset CreatedAt { get; set; }
 
     public DateTimeOffset? UpdatedAt { get; set; }
+
+    public ICollection<Employee> Employees { get; set; } = new List<Employee>();
 }
